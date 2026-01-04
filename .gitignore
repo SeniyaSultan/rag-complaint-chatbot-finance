@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Data
+data/raw/
+data/processed/
+
+# Vector stores
+vector_store/
+
+# OS files
+._*
+.DS_Store
