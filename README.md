@@ -1,90 +1,236 @@
-# RAG Complaint Analysis Chatbot - Interim Submission
+RAG Complaint Analysis Chatbot for Financial Services
 
-This repository contains the code for Tasks 1 and 2 of the "Intelligent Complaint Analysis for Financial Services" project.
+An end-to-end Retrieval-Augmented Generation (RAG) system that transforms unstructured customer complaints into actionable insights for financial service teams.
 
-## Project Structure
+This project was developed as part of the “Intelligent Complaint Analysis for Financial Services” challenge and demonstrates how vector search and large language models can be combined to support product, support, and compliance decision-making.
 
+🧠 Project Overview
+
+CrediTrust Financial receives thousands of customer complaints across multiple financial products. Manually analyzing these complaints is slow, error-prone, and reactive.
+
+This system enables internal stakeholders to:
+
+Ask plain-English questions about customer complaints
+
+Retrieve relevant complaint evidence using semantic search
+
+Generate concise, grounded answers using an LLM
+
+View source complaints to build trust and transparency
+
+✨ Key Features
+
+Exploratory Data Analysis (EDA) on real CFPB complaint data
+
+Text cleaning and preprocessing for NLP tasks
+
+Stratified sampling to avoid product bias
+
+Text chunking and embedding for semantic retrieval
+
+Vector database indexing (FAISS / ChromaDB)
+
+RAG pipeline with prompt-controlled LLM generation
+
+Qualitative evaluation of system responses
+
+Interactive chat interface built with Gradio
+
+📁 Project Structure
 rag-complaint-chatbot/
 ├── data/
-│ ├── raw/ # Raw CFPB complaint data
-│ └── processed/ # Processed and filtered data
-├── vector_store/ # Vector store files (FAISS/ChromaDB)
+│   ├── raw/                          # Raw CFPB complaint data
+│   └── processed/                   # Cleaned & filtered data
+├── vector_store/                    # Persisted FAISS / ChromaDB index
 ├── notebooks/
-│ ├── 01_eda_and_cleaning.ipynb # Task 1: EDA and preprocessing
-│ └── 02_chunk_embed_index.ipynb # Task 2: Chunking, embedding, indexing
+│   ├── 01_eda_and_cleaning.ipynb     # Task 1: EDA & preprocessing
+│   ├── 02_chunk_embed_index.ipynb    # Task 2: Chunking & embedding
+│   └── README.md
 ├── src/
-│ ├── data_preprocessing.py # Task 1 module
-│ └── vector_store_builder.py # Task 2 module
-├── tests/ # Unit tests
-├── requirements.txt # Python dependencies
-└── README.md # This file
+│   ├── data_preprocessing.py         # Data cleaning utilities
+│   ├── vector_store_builder.py       # Embedding & indexing logic
+│   └── rag_pipeline.py               # Core RAG retrieval & generation
+├── app.py                            # Gradio chat interface
+├── tests/                            # Unit tests
+├── requirements.txt                  # Python dependencies
+├── Dockerfile                        # Containerized deployment
+├── README.md                         # Project documentation
+└── .gitignore
 
-## Task 1: Exploratory Data Analysis and Data Preprocessing
+🧪 Task 1: Exploratory Data Analysis & Preprocessing
+Objectives
 
-### Objectives:
+Understand complaint structure and quality
 
-1. Understand the structure and quality of CFPB complaint data
-2. Filter data for 4 product categories
-3. Clean text narratives for embedding
-4. Save processed data for Task 2
+Identify product imbalance and narrative variability
 
-### Key Steps:
+Prepare clean text for semantic embedding
 
-1. **Data Loading**: Load CFPB complaint dataset
-2. **EDA Analysis**:
-   - Product distribution analysis
-   - Narrative length analysis
-   - Missing data analysis
-3. **Data Filtering**:
-   - Keep only: Credit Card, Personal Loan, Savings Account, Money Transfer
-   - Remove empty narratives
-4. **Text Cleaning**:
-   - Lowercasing
-   - Remove boilerplate text
-   - Remove special characters
-   - Normalize whitespace
-5. **Data Saving**: Save to `data/processed/filtered_complaints.csv`
+Key Analyses
 
-### Files:
+Complaint distribution across product categories
 
-- `notebooks/01_eda_and_cleaning.ipynb`: Interactive notebook
-- `src/data_preprocessing.py`: Reusable Python module
+Narrative length (word count) distribution
 
-## Task 2: Text Chunking, Embedding, and Vector Store Indexing
+Missing and empty narrative detection
 
-### Objectives:
+Preprocessing Steps
 
-1. Create stratified sample of 10K-15K complaints
-2. Implement text chunking strategy
-3. Generate embeddings using all-MiniLM-L6-v2
-4. Build vector stores (FAISS and ChromaDB)
-5. Store metadata with vectors
+Filter to core products:
 
-### Key Steps:
+Credit Cards
 
-1. **Stratified Sampling**: Create proportional sample across products
-2. **Text Chunking**:
-   - Chunk size: 500 characters
-   - Overlap: 50 characters
-   - Using LangChain's RecursiveCharacterTextSplitter
-3. **Embedding Generation**:
-   - Model: `all-MiniLM-L6-v2` (384 dimensions)
-   - Lightweight but effective for semantic search
-4. **Vector Store Creation**:
-   - FAISS: Lightweight, fast similarity search
-   - ChromaDB: Feature-rich, persistent store
-   - Both stores include full metadata
-5. **Persistence**: Save vector stores to `vector_store/`
+Personal Loans
 
-### Files:
+Savings Accounts
 
-- `notebooks/02_chunk_embed_index.ipynb`: Interactive notebook
-- `src/vector_store_builder.py`: Reusable Python module
+Money Transfers
 
-## Setup Instructions
+Remove empty narratives
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd rag-complaint-chatbot
-   ```
+Normalize text:
+
+Lowercasing
+
+Boilerplate removal
+
+Special character removal
+
+Whitespace normalization
+
+Output
+
+Cleaned dataset saved to:
+
+data/processed/filtered_complaints.csv
+
+🔗 Task 2: Text Chunking, Embedding & Vector Indexing
+Stratified Sampling
+
+Sample size: 10,000–15,000 complaints
+
+Ensures proportional representation across product categories
+
+Prevents retrieval bias during development
+
+Chunking Strategy
+
+Chunk size: 500 characters
+
+Overlap: 50 characters
+
+Rationale: balances semantic coherence and retrieval accuracy
+
+Embedding Model
+
+sentence-transformers/all-MiniLM-L6-v2
+
+384-dimensional embeddings
+
+Lightweight, fast, and effective for semantic similarity
+
+Vector Stores
+
+FAISS for fast similarity search
+
+ChromaDB for persistence and metadata-rich querying
+
+Metadata stored per chunk:
+
+complaint ID
+
+product category
+
+issue / sub-issue
+
+company
+
+date received
+
+chunk index
+
+🧠 Task 3: RAG Pipeline & Evaluation
+Retrieval
+
+User question → embedded using same embedding model
+
+Top-k (k=5) most relevant chunks retrieved from vector store
+
+Prompt Engineering
+
+The LLM is instructed to:
+
+Act as a financial complaint analyst
+
+Use only retrieved complaint context
+
+Avoid hallucination when evidence is insufficient
+
+Generation
+
+Retrieved chunks + question → passed to LLM
+
+Generates concise, evidence-backed answers
+
+Evaluation
+
+5–10 representative business questions tested
+
+Results analyzed using a qualitative evaluation table:
+
+Question
+
+Generated Answer
+
+Retrieved Sources
+
+Quality Score (1–5)
+
+Analysis
+
+💬 Task 4: Interactive Chat Interface
+UI Features
+
+Built with Gradio
+
+Text input for user questions
+
+AI-generated answer display
+
+Source complaint excerpts shown below each response
+
+Clear/reset functionality
+
+Goal
+
+Enable non-technical users to explore complaint data confidently and transparently.
+
+🚀 Setup Instructions
+git clone https://github.com/SeniyaSultan/rag-complaint-chatbot-finance
+cd rag-complaint-chatbot
+pip install -r requirements.txt
+python app.py
+
+📌 Key Learnings
+
+Long narratives require chunking for effective semantic retrieval
+
+Stratified sampling prevents product-level bias
+
+RAG significantly reduces hallucination compared to vanilla LLMs
+
+Showing sources is critical for user trust
+
+Lightweight models are often better for local and constrained environments
+
+🔮 Future Improvements
+
+Add product-level filters in the UI
+
+Implement response streaming
+
+Improve ranking with hybrid (BM25 + vector) search
+
+Deploy to Hugging Face Spaces or cloud infrastructure
+
+Add monitoring for retrieval quality over time
